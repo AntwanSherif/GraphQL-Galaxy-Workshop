@@ -1,7 +1,16 @@
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
-import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLNonNull, GraphQLList } from 'graphql';
+import {
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLNonNull,
+  GraphQLBoolean,
+  GraphQLList
+} from 'graphql';
 
+// add dummy users data
 export const USERS = [
   {
     id: 1,
@@ -15,13 +24,52 @@ export const USERS = [
   }
 ];
 
+// add dummy todos
+const TODOS = [
+  {
+    id: 1,
+    userId: 1,
+    task: 'Learn GraphQL',
+    completed: true
+  },
+  {
+    id: 2,
+    userId: 1,
+    task: 'Create a GraphQL API',
+    completed: false
+  },
+  {
+    id: 3,
+    userId: 2,
+    task: 'learn React',
+    completed: false
+  }
+];
+
+// define Todos type
+const TodosType = new GraphQLObjectType({
+  name: 'Todos',
+  description: 'These are a list of user todos',
+  fields: () => ({
+    id: { type: GraphQLNonNull(GraphQLInt) },
+    userId: { type: GraphQLNonNull(GraphQLInt) },
+    task: { type: GraphQLString },
+    completed: { type: GraphQLBoolean }
+  })
+});
+
+// define User type
 export const UserType = new GraphQLObjectType({
   name: 'User',
   description: 'This represents a user',
   fields: () => ({
     id: { type: GraphQLNonNull(GraphQLInt) },
     name: { type: GraphQLString },
-    email: { type: GraphQLString }
+    email: { type: GraphQLString },
+    todos: {
+      type: new GraphQLList(TodosType),
+      resolve: user => TODOS.filter(todo => todo.userId === user.id)
+    }
   })
 });
 
