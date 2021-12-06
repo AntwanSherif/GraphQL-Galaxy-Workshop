@@ -50,8 +50,34 @@ const RootQueryType = new GraphQLObjectType({
   })
 });
 
+const RootMutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'This is the root mutation',
+  fields: () => ({
+    addUser: {
+      type: UserType,
+      description: 'Add a new user',
+      args: {
+        name: { type: GraphQLNonNull(GraphQLString) },
+        email: { type: GraphQLNonNull(GraphQLString) }
+      },
+      resolve: (parent, args) => {
+        const user = {
+          id: USERS.length + 1,
+          name: args.name,
+          email: args.email
+        };
+
+        USERS.push(user);
+        return user;
+      }
+    }
+  })
+});
+
 const schema = new GraphQLSchema({
-  query: RootQueryType
+  query: RootQueryType,
+  mutation: RootMutationType
 });
 
 // Initialize express app
